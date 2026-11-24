@@ -40,6 +40,19 @@ jobs:
           if-no-files-found: error
           retention-days: 1
 
+      - name: Audit dependency tree (report only)
+        run: |
+          npm audit --json > npm-audit.json || true
+          node -e "const a=require('./npm-audit.json'); const v=a.vulnerabilities||{}; for (const [name,x] of Object.entries(v)) console.log(name + ' | ' + x.severity + ' | direct=' + x.isDirect + ' | fix=' + JSON.stringify(x.fixAvailable)); console.log('Totals:', JSON.stringify(a.metadata?.vulnerabilities || {}));"
+
+      - name: Export npm audit report
+        uses: actions/upload-artifact@v4
+        with:
+          name: npm-audit-report
+          path: npm-audit.json
+          if-no-files-found: warn
+          retention-days: 7
+
       - name: Validate Prisma schema
         run: npm run prisma:validate --workspace @vot-eto-roll/api
 
