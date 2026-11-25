@@ -1,0 +1,21 @@
+# Локальная PostgreSQL для разработки. Параметры совпадают с DATABASE_URL в CI и .env.example.
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: roll_shushi
+    ports:
+      - "5432:5432"
+    volumes:
+      - roll-shushi-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d roll_shushi"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  roll-shushi-pgdata:
